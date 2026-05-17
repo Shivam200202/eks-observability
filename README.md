@@ -345,6 +345,26 @@ kubectl get deployments -n devops-assignment
 
 ---
 
+## 📝 6. Known Issues & Assumptions
+
+* **Ephemeral Storage Assumption:** The `kube-prometheus-stack` is deployed using standard Helm chart defaults. This means Prometheus time-series data and custom Grafana dashboards are stored in the pods' ephemeral container layers. If a node fails or a pod is recreated, historical metric data and dashboard updates will reset unless a Persistent Volume Claim (PVC) backed by AWS EBS or EFS is provisioned.
+* **Bastion Host Network Access:** To facilitate straightforward configuration during this evaluation window, the Bastion Host's security group allows inbound SSH (`Port 22`) from any IP address (`0.0.0.0/0`). In a production setting, this would be locked down tightly.
+* **Public Worker Node Access (NodePorts):** The cluster exposes Prometheus (`30090`) and Grafana (`30000`) globally across the public IPs of the managed worker nodes. This assumes the evaluator needs direct browser access without configuring complex VPN tunnels or private corporate proxies.
+* **Single-AZ Node Group Risks:** While the VPC spans across multiple Availability Zones (`us-east-1a` and `us-east-1b`) for subnet infrastructure compliance, the active worker nodes are running on a lightweight single Node Group pool. A localized AWS AZ outage would result in temporary service degradation.
+
+---
+
+## 🚀 7. What to Improve for Production
+
+If migrating this setup from a local proof-of-concept assignment into a hardened, production-ready enterprise ecosystem, the following architectural enhancements would be prioritized:
+
+1. **Ingress Controllers & Layer 7 Load Balancing:** Eliminate raw `NodePorts` completely. Deploy the **AWS Load Balancer Controller** to provision an Application Load Balancer (ALB). Route dashboard traffic through an Ingress resource mapped to dedicated corporate subdomains (e.g., `grafana.company.com`) fully protected with automated SSL/TLS certificates via AWS Certificate Manager (ACM).
+2. **Stateful Persistence & High Availability:** Attach dedicated Amazon **EBS (Elastic Block Store)** or **EFS (Elastic File System)** `StorageClasses` to the Prometheus and Grafana stateful sets. This ensures metrics survive regular cluster node scaling, rolling updates, and unexpected pod rescheduling.
+3. **Strict Network Isolation (Zero-Trust Private Topology):** Migrate all EKS managed worker nodes and internal databases out of the public subnets into isolated **Private Subnets**. Route outbound internet dependencies through a secure, high-availability **NAT Gateway**. Additionally, replace the Bastion Host with **AWS Systems Manager (SSM) Session Manager** to eliminate open ports entirely.
+4. **Dedicated Notification Routing & Email Alerting:** Extend the Prometheus Alertmanager or Grafana Alerting Engine to route the `AppHealthCheckAlert` payload directly to an Amazon Simple Notification Service (SNS) topic or simple mail transfer protocol (SMTP) relay server to distribute critical real-time engineering emails the instant an operational boundary is reached.
+
+---
+
 ## 📸 Project Evidence & Proofs Reference
 
 > 📂 **Submission Notice:** All live system validation screenshots, compiled command outputs (`kubectl top`), Grafana UI visualization states (Pod CPU, Memory, and Restart counts), and triggered alert execution rules requested by the evaluation criteria are explicitly documented and located within the **`/proofs`** directory at the root of this repository.
