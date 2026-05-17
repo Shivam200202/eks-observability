@@ -2,11 +2,8 @@
 
 # Amazon EKS Infrastructure & Observability Stack (`zoop-cluster`)
 
-<img width="1441" height="957" alt="AWS-EKS" src="https://github.com/user-attachments/assets/48bb4939-43dc-49ab-ba57-a2d2e754f3ab" />
 
-
-
-This repository contains an end-to-end DevOps pipeline utilizing **Terraform** to provision an AWS Elastic Kubernetes Service (EKS) cluster, alongside **Kubernetes manifests** and **Helm charts** to deploy a resilient web application fully integrated with the `kube-prometheus-stack` monitoring ecosystem.
+This repository contains Infrastructure as Code (IaC) utilizing **Terraform**  to provision a managed AWS Elastic Kubernetes Service (EKS) cluster, alongside native **Kubernetes manifests** and **Helm charts** to deploy and monitor a resilient web application within the kube-prometheus-stack observability ecosystem.
 
 ---
 
@@ -19,6 +16,12 @@ The system architecture spans across AWS infrastructure and native Kubernetes la
 * **EKS Cluster Core:** Managed control plane orchestrating a resilient `t2.medium` Node Group.
 * **Metrics & Monitoring Engine:** Core Kubernetes metrics pulled via `metrics-server`, feeding into a full Prometheus operator deployment managed via Helm.
 * **Application Workspace:** An isolated namespace (`devops-assignment`) running a resource-bounded, health-checked Nginx backend scaled across replicas.
+
+---
+
+## Core Architecture Layout
+
+<img width="1441" height="957" alt="AWS-EKS" src="https://github.com/user-attachments/assets/48bb4939-43dc-49ab-ba57-a2d2e754f3ab" />
 
 ---
 
