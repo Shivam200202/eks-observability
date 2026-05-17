@@ -77,6 +77,7 @@ terraform plan
 terraform apply --auto-approve
 
 ```
+<img width="2560" height="1440" alt="Terraform Complete" src="https://github.com/user-attachments/assets/25cf55e3-17ca-495b-815b-8bdf18fe0f24" />
 
 ---
 
