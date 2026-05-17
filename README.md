@@ -224,15 +224,6 @@ sum(increase(kube_pod_container_status_restarts_total{namespace="devops-assignme
 
 * **The `> 0` filter:** Limits noise by ensuring the dashboard only populates pods actively experiencing instability.
 
-### 4. Health Check Evaluation
-
-Instantly targets pods that have shifted out of standard `Running` or `Succeeded` operational lifecycle phases.
-
-```promql
-sum(kube_pod_status_phase{namespace="devops-assignment", phase=~"Failed|Unknown|Pending"}) by (pod) > 0
-
-```
-
 ---
 
 ## 🚨 Grafana Alert Setup Guide (`AppHealthCheckAlert`)
