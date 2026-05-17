@@ -197,7 +197,7 @@ kubectl get secret -n monitoring monitoring-stack-grafana -o jsonpath="{.data.ad
 
 ---
 
-## 📊 Dashboard PromQL Queries (Optimized)
+## 📊 Dashboard PromQL Queries
 
 ### 1. Pod CPU Dashboard
 
