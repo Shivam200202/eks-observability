@@ -154,9 +154,6 @@ kubectl apply -f K8s/prometheus_grafana_svc.yaml
 
 ```
 
-<img width="2547" height="1389" alt="GUI Prom and Grafana" src="https://github.com/user-attachments/assets/3d79b7a4-fb47-41d3-acec-6ccb6636caac" />
-
-
 ---
 
 ## 🔍 Validation & Verification Commands
