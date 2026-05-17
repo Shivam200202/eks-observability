@@ -344,3 +344,9 @@ kubectl get deployments -n devops-assignment
 > 💡 **Access Hint:** To view the dashboards, grab your EKS Worker Nodes' public IPs and paste `http://<Node-Public-IP>:<NodePort>` into your web browser. Ensure your security group controls (`zoop_nodes_sg`) allow traffic across the `30000-32767` NodePort range.
 
 ---
+
+## 📸 Project Evidence & Proofs Reference
+
+> 📂 **Submission Notice:** All live system validation screenshots, compiled command outputs (`kubectl top`), Grafana UI visualization states (Pod CPU, Memory, and Restart counts), and triggered alert execution rules requested by the evaluation criteria are explicitly documented and located within the **`/proofs`** directory at the root of this repository.
+
+---
