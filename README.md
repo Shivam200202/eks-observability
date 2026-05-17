@@ -1,101 +1,59 @@
-Amazon EKS Infrastructure with Terraform (zoop-cluster)
-This repository contains the Infrastructure as Code (IaC) using Terraform to provision a fully functional, secure, and scalable Amazon Elastic Kubernetes Service (EKS) cluster on AWS, alongside a dedicated Bastion Host for secure cluster management.
+---
 
-🏗️ Architecture Overview
-The infrastructure provisions the following AWS components:
+### Step 1: Create a New Alert Rule
 
-Custom VPC: A dedicated 10.0.0.0/16 network isolated from default infrastructure.
+1. In the left-hand main sidebar, hover over the **Alerting** (bell) icon and click on **Alert rules**.
+2. Click the orange **Create alert rule** button at the top right of the page.
 
-Public Subnets: Two subnets spanning us-east-1a and us-east-1b tagged with Kubernetes ELB setup rules (kubernetes.io/role/elb = 1).
+### Step 2: Name and Define the Core Target
 
-Bastion Host (EC2): A secure t2.micro Ubuntu instance sitting in the public subnet acting as the administrative gateway. It is pre-bootstrapped via user_data to install the AWS CLI, kubectl, and automatically inject the cluster's kubeconfig on startup.
+1. **Name:** Set the rule name to `AppHealthCheckAlert`.
+2. **Rule type:** Select **Grafana managed alert**.
 
-EKS Control Plane: The managed Kubernetes master plane (zoop-cluster).
+### Step 3: Configure the PromQL Query & Performance Options
 
-EKS Node Group: A managed worker node pool utilizing t2.medium instances with automated scaling configurations.
+1. Under **Query A**, make sure your local **Prometheus** data source is active in the dropdown selection.
+2. In the code input box, paste the optimized boolean metric string:
+```promql
+(sum(kube_deployment_status_replicas_available{deployment="backend", namespace="devops-assignment"}) by (namespace) == 0) + 1 
+or 
+(sum(increase(kube_pod_container_status_restarts_total{namespace="devops-assignment"}[5m])) by (namespace) > 2)
 
-🛠️ Prerequisites
-Before you start, ensure you have the following tools installed locally:
+```
 
-Terraform (v1.0+)
 
-AWS CLI installed locally
+3. Set the configuration selectors above or below the query text to these values:
+* **Type:** `Instant` *(Forces a single execution value check instead of an entire timeline line graph)*
+* **Format:** `Table` *(Formats the raw output data into a structured layout for easy metric reading)*
 
-An Amazon EC2 Key Pair named zoop-key created in your target region (us-east-1)
 
-PowerShell (if executing the included authentication script)
 
-⚙️ Configuration & Environment Variables
-1. Terraform Variables (terraform.tfvars)
-The infrastructure behavior can be adjusted by modifying variables in terraform.tfvars:
+### Step 4: Map the Condition Evaluator
 
-Terraform
-aws_region      = "us-east-1"
-cluster_name    = "zoop-cluster"
-node_group_name = "zoop-node-group"
-instance_type   = "t2.medium"
-2. AWS Authentication Script (aws.ps1)
-To authenticate your local deployment environment with AWS using PowerShell, a helper script is included. Update this file with your temporary AWS IAM credentials:
+In the **Alert condition** (or Condition C) block at the bottom of the query section, establish the mathematical trap:
 
-PowerShell
-$env:AWS_ACCESS_KEY_ID="YOUR_ACCESS_KEY_ID"
-$env:AWS_SECRET_ACCESS_KEY="YOUR_SECRET_ACCESS_KEY"
-⚠️ CRITICAL SECURITY NOTE: Never commit your actual AWS Access Keys to GitHub. Ensure aws.ps1 is added to your .gitignore file before pushing your code.
+* **WHEN QUERY:** `A`
+* **Evaluator:** Change dropdown to **`Is above`**
+* **Value:** Type **`0`**
+*(When the system crashes, the query output yields a `1`. Since 1 is above 0, the threshold is successfully crossed and the alert trips!)*
 
-🚀 Deployment Guide
-Follow these steps to initialize and spin up the infrastructure:
+### Step 5: Assign Folder Organization & Labels
 
-1. Clone & Navigate to Directory
-PowerShell
-git clone <your-repo-url>
-cd DevOps/Terraform/EKS
-2. Set Up AWS Credentials
-Run the script to inject your AWS access tokens into your active PowerShell session:
+Scroll down to the storage sections:
 
-PowerShell
-.\aws.ps1
-3. Initialize Terraform
-Initialize the working directory to download the required AWS providers.
+1. **Folder:** Click the dropdown $\rightarrow$ select **New folder** $\rightarrow$ create one called `EKS-Observability`.
+2. **Evaluation group:** Click **New evaluation group** $\rightarrow$ name it `app-health-group`.
+3. **Labels:** Click **Add labels** $\rightarrow$ add a Key of `severity` and a Value of `critical`.
 
-PowerShell
-terraform init
-4. Review Plan
-Generate and review the execution plan to verify the AWS resources that will be built.
+### Step 6: Define Evaluation Interval and Buffers
 
-PowerShell
-terraform plan
-5. Apply Configuration
-Provision the infrastructure. This process typically takes around 10 to 15 minutes while AWS spins up the managed EKS control plane.
+Under **Set evaluation behavior**:
 
-PowerShell
-terraform apply --auto-approve
-🔓 Accessing the Cluster
-Management of the cluster is routed securely through the Bastion Host.
+1. **Evaluation interval:** Set to `1m` *(Checks if the logic is broken every 60 seconds)*.
+2. **Pending period (For):** Select or type **`2m`**. *(Ensures temporary network or container blips don't wake up team engineers—the failure state must hold consistently for 2 minutes before changing to a flashing red status)*.
 
-Step 1: Get Bastion Connection Info
-Once the apply finishes, capture the public IP of your bastion host from the Terraform outputs:
+### Step 7: Finalize Description Messages & Save
 
-PowerShell
-terraform output bastion_public_ip
-Step 2: SSH Into the Bastion Host
-Using your zoop-key.pem file, log into the provisioning server:
-
-PowerShell
-ssh -i "zoop-key.pem" ubuntu@<bastion_public_ip>
-Step 3: Verify Pre-Installed Tools
-The startup scripts automatically installed your dependencies and injected the EKS configuration into your environment. Verify interaction with your cluster by running:
-
-Bash
-# Check if nodes are ready and active
-kubectl get nodes
-🔒 Security Group Specifications
-Bastion Host SG: Restricts inbound exposure exclusively to SSH port 22 from anywhere (0.0.0.0/0). (Note: For production environments, change cidr_blocks to your specific public IP).
-
-Worker Nodes SG: Allows unhindered internal communication between nodes and the EKS control plane. Exposes NodePort ranges 30000-32767 to allow standard external access to application routing.
-
-🧼 Cleanup
-To wipe the slate clean and avoid recurring AWS charges for the EKS cluster, node groups, and EC2 instances, execute the destruction sequence:
-
-PowerShell
-terraform destroy --auto-approve
-
+1. In the **Summary** text box, type: `Application Down or Pod Crashlooping`.
+2. In the **Description** box, note what the alert tracks for anyone viewing it.
+3. Scroll back up to the top right header bar and click **Save rule and exit**.
