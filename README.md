@@ -133,6 +133,9 @@ helm install monitoring-stack prometheus-community/kube-prometheus-stack --names
 
 ```
 
+<img width="1938" height="1062" alt="Prom   grafana" src="https://github.com/user-attachments/assets/42cc4a97-361d-422b-ba33-21097b5ddc2f" />
+
+
 #### 3. Deploy the Core Backend Application
 
 Creates the dedicated `devops-assignment` namespace, brings up healthy, memory-bounded app replicas (`nginx:alpine`), and configures internal routing policies:
@@ -150,6 +153,9 @@ Maps internal Prometheus and Grafana operator cluster endpoints onto visible AWS
 kubectl apply -f K8s/prometheus_grafana_svc.yaml
 
 ```
+
+<img width="2547" height="1389" alt="GUI Prom and Grafana" src="https://github.com/user-attachments/assets/3d79b7a4-fb47-41d3-acec-6ccb6636caac" />
+
 
 ---
 
@@ -181,6 +187,9 @@ kubectl get secret -n monitoring monitoring-stack-grafana -o jsonpath="{.data.ad
 ```
 
 * **Default Username:** `admin`
+
+<img width="2547" height="1389" alt="GUI Prom and Grafana" src="https://github.com/user-attachments/assets/04330255-5b09-4784-943c-39bb7284afae" />
+
 
 ---
 
