@@ -2,7 +2,8 @@
 
 # Amazon EKS Infrastructure & Observability Stack (`zoop-cluster`)
 
-![Uploading AWS-EKS.svg…]()
+<img width="1441" height="957" alt="AWS-EKS" src="https://github.com/user-attachments/assets/48bb4939-43dc-49ab-ba57-a2d2e754f3ab" />
+
 
 
 This repository contains an end-to-end DevOps pipeline utilizing **Terraform** to provision an AWS Elastic Kubernetes Service (EKS) cluster, alongside **Kubernetes manifests** and **Helm charts** to deploy a resilient web application fully integrated with the `kube-prometheus-stack` monitoring ecosystem.
