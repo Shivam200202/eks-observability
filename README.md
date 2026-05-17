@@ -197,11 +197,10 @@ kubectl get secret -n monitoring monitoring-stack-grafana -o jsonpath="{.data.ad
 
 ---
 
-## 📊 Dashboard PromQL Queries
+## 📊 PromQL Queries
 
 ### 1. Pod CPU Dashboard
 
-Uses pre-aggregated recording rules to calculate efficient core usage without heavy on-the-fly math.
 
 ```promql
 sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{namespace="devops-assignment"}) by (pod)
@@ -210,18 +209,13 @@ sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate{nam
 
 ### 2. Pod Memory Dashboard
 
-Tracks the exact working set memory, which is the primary metric the Kubernetes OOM (Out Of Memory) Killer uses to evaluate termination targets.
 
 ```promql
 sum(container_memory_working_set_bytes{namespace="devops-assignment", container!=""}) by (pod)
 
 ```
 
-* **Grafana Configuration Tip:** Set the panel unit configuration to **Data (Metric) -> Bytes** so raw numbers auto-render cleanly into MB or GB.
-
 ### 3. Pod Restart Dashboard
-
-Tracks rapid container restarts over a tight, rolling time window.
 
 ```promql
 sum(increase(kube_pod_container_status_restarts_total{namespace="devops-assignment"}[5m])) by (pod) > 0
