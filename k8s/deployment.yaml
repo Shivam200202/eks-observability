@@ -49,10 +49,8 @@ metadata:
   name: backend-service
   namespace: devops-assignment
 spec:
-#  type: NodePort
   selector:
     app: backend
   ports:
     - port: 80
       targetPort: 80
-#      nodePort: 30080
